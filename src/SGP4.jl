@@ -1,12 +1,12 @@
 # Julia wrapper for the sgp4 Python library:
 # https://pypi.python.org/pypi/sgp4/
 
-# Requres a slightly modified version of the library
-
+#VERSION >= v"0.4.0-dev+6521" && __precompile__(false)
 module SGP4
 
-using PyCall, 
-      Dates # not needed in julia v0.4
+using PyCall
+
+VERSION < v"0.4.0" && using Dates
 
 export GravityModel,
        twoline2rv,
@@ -24,6 +24,11 @@ GravityModel(ref::ASCIIString) = earth_gravity.pymember(ref)
 # sgp4.io convenience functions
 twoline2rv(args...) = sgp4io.twoline2rv(args...)
 
+"""
+Propagate the satellite from its epoch to the date/time specified
+
+Returns (position, velocity) at the specified time
+"""
 function propagate( sat::PyObject,
                     year::Real,
                     month::Real,
@@ -31,9 +36,6 @@ function propagate( sat::PyObject,
                     hour::Real,
                     min::Real,
                     sec::Real )
-    # propagate the satellite from its epoch to the date/time
-    # specified
-    # returns (position, velocity) at the specified time
     (pos, vel) = sat[:propagate](year,month,day,hour,min,sec)
 
     # check for errors
@@ -47,14 +49,15 @@ end
 function propagate( sat::PyObject,
                     t::DateTime )
     propagate(sat,
-              year(t),
-              month(t),
-              day(t),
-              hour(t),
-              minute(t),
-              second(t))
+              Dates.year(t),
+              Dates.month(t),
+              Dates.day(t),
+              Dates.hour(t),
+              Dates.minute(t),
+              Dates.second(t))
 end
 
+"Propagate many satellites to a common time"
 function propagate( sats::Vector{PyObject},
                     year::Real,
                     month::Real,
@@ -62,7 +65,6 @@ function propagate( sats::Vector{PyObject},
                     hour::Real,
                     min::Real,
                     sec::Real )
-    # propagate many satellites to a common time
     pos = zeros(3,length(sats))
     vel = zeros(3,length(sats))
     for i = 1:length(sats)
@@ -71,5 +73,15 @@ function propagate( sats::Vector{PyObject},
     return (pos,vel)
 end
 
+function propagate( sats::Vector{PyObject},
+                    t::DateTime )
+    propagate(sats,
+              Dates.year(t),
+              Dates.month(t),
+              Dates.day(t),
+              Dates.hour(t),
+              Dates.minute(t),
+              Dates.second(t))
+end
 
 end #module
