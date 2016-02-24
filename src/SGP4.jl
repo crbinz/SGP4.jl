@@ -12,12 +12,9 @@ function __init__()
     global const earth_gravity = PyCall.pywrap(pyimport("sgp4.earth_gravity"))
 end
 
-using Dates
-
 export GravityModel,
        twoline2rv,
        propagate
-
 
 immutable GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
