@@ -1,20 +1,23 @@
 # Julia wrapper for the sgp4 Python library:
 # https://pypi.python.org/pypi/sgp4/
 
-#VERSION >= v"0.4.0-dev+6521" && __precompile__(false)
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
 module SGP4
 
 using PyCall
 
-VERSION < v"0.4.0" && using Dates
+function __init__()
+    global const sgp4io = PyCall.pywrap(pyimport("sgp4.io"))
+    global const earth_gravity = PyCall.pywrap(pyimport("sgp4.earth_gravity"))
+end
+
+using Dates
 
 export GravityModel,
        twoline2rv,
        propagate
 
-# initialization
-@pyimport sgp4.io as sgp4io
-@pyimport sgp4.earth_gravity as earth_gravity
 
 immutable GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
