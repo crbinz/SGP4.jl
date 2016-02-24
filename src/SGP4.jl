@@ -8,8 +8,12 @@ module SGP4
 using PyCall
 
 function __init__()
-    global const sgp4io = PyCall.pywrap(pyimport("sgp4.io"))
-    global const earth_gravity = PyCall.pywrap(pyimport("sgp4.earth_gravity"))
+    try 
+        global const sgp4io = PyCall.pywrap(pyimport("sgp4.io"))
+        global const earth_gravity = PyCall.pywrap(pyimport("sgp4.earth_gravity"))
+    catch e
+        error("Error loading sgp4 python package - check to make sure it's installed")
+    end
 end
 
 export GravityModel,
