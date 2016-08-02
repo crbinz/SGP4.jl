@@ -1,28 +1,38 @@
 # Julia wrapper for the sgp4 Python library:
 # https://pypi.python.org/pypi/sgp4/
 
-# Requres a slightly modified version of the library
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module SGP4
 
 using PyCall
 
+function __init__()
+    try 
+        global const sgp4io = PyCall.pywrap(pyimport("sgp4.io"))
+        global const earth_gravity = PyCall.pywrap(pyimport("sgp4.earth_gravity"))
+    catch e
+        error("Error loading sgp4 python package - check to make sure it's installed")
+    end
+end
+
 export GravityModel,
        twoline2rv,
        propagate
 
-# initialization
-@pyimport sgp4.io as sgp4io
-@pyimport sgp4.earth_gravity as earth_gravity
-
 immutable GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
 end
-GravityModel(ref::String) = earth_gravity.pymember(ref)
+GravityModel(ref::AbstractString) = earth_gravity.pymember(ref)
 
 # sgp4.io convenience functions
 twoline2rv(args...) = sgp4io.twoline2rv(args...)
 
+"""
+Propagate the satellite from its epoch to the date/time specified
+
+Returns (position, velocity) at the specified time
+"""
 function propagate( sat::PyObject,
                     year::Real,
                     month::Real,
@@ -30,9 +40,6 @@ function propagate( sat::PyObject,
                     hour::Real,
                     min::Real,
                     sec::Real )
-    # propagate the satellite from its epoch to the date/time
-    # specified
-    # returns (position, velocity) at the specified time
     (pos, vel) = sat[:propagate](year,month,day,hour,min,sec)
 
     # check for errors
@@ -46,14 +53,15 @@ end
 function propagate( sat::PyObject,
                     t::DateTime )
     propagate(sat,
-              year(t),
-              month(t),
-              day(t),
-              hour(t),
-              minute(t),
-              second(t))
+              Dates.year(t),
+              Dates.month(t),
+              Dates.day(t),
+              Dates.hour(t),
+              Dates.minute(t),
+              Dates.second(t))
 end
 
+"Propagate many satellites to a common time"
 function propagate( sats::Vector{PyObject},
                     year::Real,
                     month::Real,
@@ -61,7 +69,6 @@ function propagate( sats::Vector{PyObject},
                     hour::Real,
                     min::Real,
                     sec::Real )
-    # propagate many satellites to a common time
     pos = zeros(3,length(sats))
     vel = zeros(3,length(sats))
     for i = 1:length(sats)
@@ -70,5 +77,15 @@ function propagate( sats::Vector{PyObject},
     return (pos,vel)
 end
 
+function propagate( sats::Vector{PyObject},
+                    t::DateTime )
+    propagate(sats,
+              Dates.year(t),
+              Dates.month(t),
+              Dates.day(t),
+              Dates.hour(t),
+              Dates.minute(t),
+              Dates.second(t))
+end
 
 end #module
