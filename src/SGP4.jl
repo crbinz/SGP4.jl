@@ -25,7 +25,7 @@ export GravityModel,
 immutable GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
 end
-GravityModel(ref::ASCIIString) = earth_gravity.pymember(ref)
+GravityModel(ref::AbstractString) = earth_gravity.pymember(ref)
 
 # sgp4.io convenience functions
 twoline2rv(args...) = sgp4io.twoline2rv(args...)
