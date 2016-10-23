@@ -10,6 +10,7 @@ import Compat.ASCIIString
 using PyCall
 
 function __init__()
+    pyimport_conda("sgp4", "sgp4", "poliastro")
     try 
         global const sgp4io = PyCall.pywrap(pyimport("sgp4.io"))
         global const earth_gravity = PyCall.pywrap(pyimport("sgp4.earth_gravity"))
