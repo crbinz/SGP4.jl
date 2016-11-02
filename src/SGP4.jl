@@ -5,18 +5,16 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module SGP4
 
-import Compat.ASCIIString
+import Compat.String
 
 using PyCall
 
+const sgp4io = PyNULL()
+const earth_gravity = PyNULL()
+
 function __init__()
-    pyimport_conda("sgp4", "sgp4", "poliastro")
-    try 
-        global const sgp4io = PyCall.pywrap(pyimport("sgp4.io"))
-        global const earth_gravity = PyCall.pywrap(pyimport("sgp4.earth_gravity"))
-    catch e
-        error("Error loading sgp4 python package - check to make sure it's installed")
-    end
+    copy!(sgp4io, pyimport_conda("sgp4.io", "sgp4", "poliastro"))
+    copy!(earth_gravity, pyimport("sgp4.earth_gravity"))
 end
 
 export GravityModel,
@@ -26,10 +24,10 @@ export GravityModel,
 immutable GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
 end
-GravityModel(ref::AbstractString) = earth_gravity.pymember(ref)
+GravityModel(ref::String) = earth_gravity[ref]
 
 # sgp4.io convenience functions
-twoline2rv(args...) = sgp4io.twoline2rv(args...)
+twoline2rv(args...) = sgp4io["twoline2rv"](args...)
 
 """
 Propagate the satellite from its epoch to the date/time specified
