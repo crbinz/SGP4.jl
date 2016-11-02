@@ -5,8 +5,6 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module SGP4
 
-import Compat.String
-
 using PyCall
 
 const sgp4io = PyNULL()
@@ -24,7 +22,7 @@ export GravityModel,
 immutable GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
 end
-GravityModel(ref::String) = earth_gravity[ref]
+GravityModel(ref::AbstractString) = earth_gravity[ref]
 
 # sgp4.io convenience functions
 twoline2rv(args...) = sgp4io["twoline2rv"](args...)
