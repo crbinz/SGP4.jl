@@ -60,6 +60,30 @@ function propagate( sat::PyObject,
               Dates.second(t))
 end
 
+"Generate a satellite ephemeris"
+function propagate( sat::PyObject,
+                    tstart::DateTime,
+                    tstop::DateTime,
+                    tstep::Dates.TimePeriod )
+    tspan = tstart:tstep:tstop
+    pos = zeros(3,length(tspan))
+    vel = zeros(3,length(tspan))
+
+    for (idx, ti) in enumerate(tspan)
+        pos[:,idx], vel[:,idx] = propagate(sat,ti)
+    end
+
+    return (pos,vel)
+end
+
+"tstep specified in seconds"
+function propagate( sat::PyObject,
+                    tstart::DateTime,
+                    tstop::DateTime,
+                    tstep::Real )
+    propagate(sat,tstart,tstop,Dates.Second(tstep))
+end
+
 "Propagate many satellites to a common time"
 function propagate( sats::Vector{PyObject},
                     year::Real,
