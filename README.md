@@ -25,4 +25,10 @@ satellite = twoline2rv(line1, line2, wgs72)
 
 `satellite` attributes, such as the TLE epoch, may be accessed as `satellite[:epoch]`.
 
+You can also generate an ephemeris, given a TLE, start date/time, stop date/time, and time step:
+
+```
+(positions, velocities) = propagate(satellite, Dates.DateTime("2000-06-29T12:50:19.000"), Dates.DateTime("2000-06-30T12:50:19.000"), Dates.Second(60))
+```
+
 For other documentation, see [this page](https://pypi.python.org/pypi/sgp4/).
