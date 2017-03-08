@@ -70,20 +70,24 @@ function propagate( sat::SGP4Sat,
               Dates.second(t))
 end
 
+function propagate(sat::SGP4Sat,
+                   t::AbstractVector{DateTime})
+    pos = zeros(3, length(t)) 
+    vel = zeros(3, length(t)) 
+
+    for (idx, ti) in enumerate(t)
+        pos[:,i],vel[:,i] = propagate(sat, ti)
+    end
+    return (pos,vel)
+end
+
 "Generate a satellite ephemeris"
 function propagate( sat::SGP4Sat,
                     tstart::DateTime,
                     tstop::DateTime,
                     tstep::Dates.TimePeriod )
-    tspan = tstart:tstep:tstop
-    pos = zeros(3,length(tspan))
-    vel = zeros(3,length(tspan))
 
-    for (idx, ti) in enumerate(tspan)
-        pos[:,idx], vel[:,idx] = propagate(sat,ti)
-    end
-
-    return (pos,vel)
+    propagate(sat, tstart:step,tstop)
 end
 
 "tstep specified in seconds"
