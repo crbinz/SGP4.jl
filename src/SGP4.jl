@@ -7,6 +7,8 @@ module SGP4
 
 using PyCall
 
+import Base.getindex
+
 const sgp4io = PyNULL()
 const earth_gravity = PyNULL()
 
@@ -26,6 +28,7 @@ end
 type SGP4Sat
     s::PyObject
 end
+getindex(sat::SGP4Sat, sym::Symbol) = sat.s[sym]
 
 GravityModel(ref::AbstractString) = GravityModel(earth_gravity[ref])
 
