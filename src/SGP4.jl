@@ -76,7 +76,7 @@ function propagate(sat::SGP4Sat,
     vel = zeros(3, length(t)) 
 
     for (idx, ti) in enumerate(t)
-        pos[:,i],vel[:,i] = propagate(sat, ti)
+        pos[:,idx],vel[:,idx] = propagate(sat, ti)
     end
     return (pos,vel)
 end
