@@ -7,6 +7,7 @@ module SGP4
 
 using PyCall
 
+import Compat.ASCIIString
 import Base.getindex
 
 const sgp4io = PyNULL()
