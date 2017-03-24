@@ -87,8 +87,7 @@ function propagate( sat::SGP4Sat,
                     tstart::DateTime,
                     tstop::DateTime,
                     tstep::Dates.TimePeriod )
-
-    propagate(sat, tstart:step,tstop)
+    propagate(sat, tstart:tstep:tstop)
 end
 
 "tstep specified in seconds"
