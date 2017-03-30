@@ -7,6 +7,9 @@ module SGP4
 
 using PyCall
 
+import Compat.ASCIIString
+import Base.getindex
+
 const sgp4io = PyNULL()
 const earth_gravity = PyNULL()
 
@@ -22,34 +25,42 @@ export GravityModel,
 immutable GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
 end
-GravityModel(ref::AbstractString) = earth_gravity[ref]
+
+type SGP4Sat
+    s::PyObject
+end
+getindex(sat::SGP4Sat, sym::Symbol) = sat.s[sym]
+
+GravityModel(ref::AbstractString) = GravityModel(earth_gravity[ref])
 
 # sgp4.io convenience functions
-twoline2rv(args...) = sgp4io["twoline2rv"](args...)
+function twoline2rv(line1::ASCIIString, line2::ASCIIString, grav::GravityModel)
+    return SGP4Sat(sgp4io["twoline2rv"](line1,line2,grav.model))
+end
 
 """
 Propagate the satellite from its epoch to the date/time specified
 
 Returns (position, velocity) at the specified time
 """
-function propagate( sat::PyObject,
+function propagate( sat::SGP4Sat,
                     year::Real,
                     month::Real,
                     day::Real,
                     hour::Real,
                     min::Real,
                     sec::Real )
-    (pos, vel) = sat[:propagate](year,month,day,hour,min,sec)
+    (pos, vel) = sat.s[:propagate](year,month,day,hour,min,sec)
 
     # check for errors
-    if sat[:error] != 0
-        println(sat[:error_message])
+    if sat.s[:error] != 0
+        println(sat.s[:error_message])
     end
 
     return ([pos...],[vel...])
 end
 
-function propagate( sat::PyObject,
+function propagate( sat::SGP4Sat,
                     t::DateTime )
     propagate(sat,
               Dates.year(t),
@@ -60,24 +71,27 @@ function propagate( sat::PyObject,
               Dates.second(t))
 end
 
-"Generate a satellite ephemeris"
-function propagate( sat::PyObject,
-                    tstart::DateTime,
-                    tstop::DateTime,
-                    tstep::Dates.TimePeriod )
-    tspan = tstart:tstep:tstop
-    pos = zeros(3,length(tspan))
-    vel = zeros(3,length(tspan))
+function propagate(sat::SGP4Sat,
+                   t::AbstractVector{DateTime})
+    pos = zeros(3, length(t)) 
+    vel = zeros(3, length(t)) 
 
-    for (idx, ti) in enumerate(tspan)
-        pos[:,idx], vel[:,idx] = propagate(sat,ti)
+    for (idx, ti) in enumerate(t)
+        pos[:,idx],vel[:,idx] = propagate(sat, ti)
     end
-
     return (pos,vel)
 end
 
+"Generate a satellite ephemeris"
+function propagate( sat::SGP4Sat,
+                    tstart::DateTime,
+                    tstop::DateTime,
+                    tstep::Dates.TimePeriod )
+    propagate(sat, tstart:tstep:tstop)
+end
+
 "tstep specified in seconds"
-function propagate( sat::PyObject,
+function propagate( sat::SGP4Sat,
                     tstart::DateTime,
                     tstop::DateTime,
                     tstep::Real )
@@ -85,7 +99,7 @@ function propagate( sat::PyObject,
 end
 
 "Propagate many satellites to a common time"
-function propagate( sats::Vector{PyObject},
+function propagate( sats::Vector{SGP4Sat},
                     year::Real,
                     month::Real,
                     day::Real,
@@ -100,7 +114,7 @@ function propagate( sats::Vector{PyObject},
     return (pos,vel)
 end
 
-function propagate( sats::Vector{PyObject},
+function propagate( sats::Vector{SGP4Sat},
                     t::DateTime )
     propagate(sats,
               Dates.year(t),
