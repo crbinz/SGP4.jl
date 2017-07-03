@@ -5,7 +5,7 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module SGP4
 
-using PyCall
+using PyCall, Compat
 
 import Compat.ASCIIString
 import Base.getindex
