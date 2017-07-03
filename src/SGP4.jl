@@ -47,7 +47,8 @@ Returns (position, velocity)
 """
 function sgp4( sat::SGP4Sat,
                dtmin::Real )
-    sgp4_propagation["sgp4"](sat.s, dtmin)
+    r,v = sgp4_propagation["sgp4"](sat.s, dtmin)
+    return vcat(r...), vcat(v...)
 end
 
 """
