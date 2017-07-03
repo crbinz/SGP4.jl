@@ -21,21 +21,21 @@ function test_single_time()
 
     @test satellite[:error] == 0
 
-    @test_approx_eq_eps position[1] position2[1] eps() 
-    @test_approx_eq_eps position[2] position2[2] eps()
-    @test_approx_eq_eps position[3] position2[3] eps()
-
-    @test_approx_eq_eps velocity[1] velocity2[1] eps()
-    @test_approx_eq_eps velocity[2] velocity2[2] eps()
-    @test_approx_eq_eps velocity[3] velocity2[3] eps()
-
-    @test_approx_eq_eps position[1] 5576.056952 1e-6
-    @test_approx_eq_eps position[2] -3999.371134 1e-6
-    @test_approx_eq_eps position[3] -1521.957159 1e-6
-
-    @test_approx_eq_eps velocity[1] 4.772627 1e-6
-    @test_approx_eq_eps velocity[2] 5.119817 1e-6
-    @test_approx_eq_eps velocity[3] 4.275553 1e-6
+    @test isapprox(position[1], position2[1], atol=eps())
+    @test isapprox(position[2], position2[2], atol=eps())
+    @test isapprox(position[3], position2[3], atol=eps())
+   
+    @test isapprox(velocity[1], velocity2[1], atol=eps())
+    @test isapprox(velocity[2], velocity2[2], atol=eps())
+    @test isapprox(velocity[3], velocity2[3], atol=eps())
+  
+    @test isapprox(position[1], 5576.056952, atol=1e-6)
+    @test isapprox(position[2], -3999.371134,atol= 1e-6)
+    @test isapprox(position[3], -1521.957159,atol= 1e-6)
+ 
+    @test isapprox(velocity[1], 4.772627, atol=1e-6)
+    @test isapprox(velocity[2], 5.119817, atol=1e-6)
+    @test isapprox(velocity[3], 4.275553, atol=1e-6)
 end
 
 function test_multiple_sats()
@@ -45,13 +45,13 @@ function test_multiple_sats()
 
     (positions, velocities) = SGP4.propagate( sats, t )
 
-    @test_approx_eq_eps positions[1,1] positions[1,3] eps() 
-    @test_approx_eq_eps positions[2,1] positions[2,3] eps()
-    @test_approx_eq_eps positions[3,1] positions[3,3] eps()
+    @test isapprox(positions[1,1], positions[1,3], atol=eps())
+    @test isapprox(positions[2,1], positions[2,3], atol=eps())
+    @test isapprox(positions[3,1], positions[3,3], atol=eps())
 
-    @test_approx_eq_eps velocities[1,1] velocities[1,3] eps()  
-    @test_approx_eq_eps velocities[2,1] velocities[2,3] eps()
-    @test_approx_eq_eps velocities[3,1] velocities[3,3] eps()
+    @test isapprox(velocities[1,1], velocities[1,3], atol=eps()) 
+    @test isapprox(velocities[2,1], velocities[2,3], atol=eps())
+    @test isapprox(velocities[3,1], velocities[3,3], atol=eps())
 end
 
 function test_datetime_ephem()
@@ -60,26 +60,26 @@ function test_datetime_ephem()
     tstop = Dates.DateTime(2000, 6, 29, 13, 50, 19)
     (pos, vel) = SGP4.propagate(sat, tstart, tstop, 60)
 
-    @test_approx_eq_eps pos[1,1] 5576.056952 1e-6
-    @test_approx_eq_eps pos[2,1] -3999.371134 1e-6
-    @test_approx_eq_eps pos[3,1] -1521.957159 1e-6
+    @test isapprox(pos[1,1], 5576.056952,  atol=1e-6)
+    @test isapprox(pos[2,1], -3999.371134, atol=1e-6)
+    @test isapprox(pos[3,1], -1521.957159, atol=1e-6)
 
-    @test_approx_eq_eps vel[1,1] 4.772627 1e-6
-    @test_approx_eq_eps vel[2,1] 5.119817 1e-6
-    @test_approx_eq_eps vel[3,1] 4.275553 1e-6
+    @test isapprox(vel[1,1], 4.772627, atol=1e-6)
+    @test isapprox(vel[2,1], 5.119817, atol=1e-6)
+    @test isapprox(vel[3,1], 4.275553, atol=1e-6)
 
     @test size(pos,2) == 61
     @test size(vel,2) == 61
 
     (pos, vel) = SGP4.propagate(sat, tstart:Dates.Second(30):tstop)
 
-    @test_approx_eq_eps pos[1,1] 5576.056952 1e-6
-    @test_approx_eq_eps pos[2,1] -3999.371134 1e-6
-    @test_approx_eq_eps pos[3,1] -1521.957159 1e-6
-
-    @test_approx_eq_eps vel[1,1] 4.772627 1e-6
-    @test_approx_eq_eps vel[2,1] 5.119817 1e-6
-    @test_approx_eq_eps vel[3,1] 4.275553 1e-6
+    @test isapprox(pos[1,1], 5576.056952, atol=1e-6)
+    @test isapprox(pos[2,1], -3999.371134,atol= 1e-6)
+    @test isapprox(pos[3,1], -1521.957159,atol= 1e-6)
+                     
+    @test isapprox(vel[1,1], 4.772627, atol=1e-6)
+    @test isapprox(vel[2,1], 5.119817, atol=1e-6)
+    @test isapprox(vel[3,1], 4.275553, atol=1e-6)
 
     @test size(pos,2) == 121
     @test size(vel,2) == 121
