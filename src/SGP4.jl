@@ -12,10 +12,12 @@ import Base.getindex
 
 const sgp4io = PyNULL()
 const earth_gravity = PyNULL()
+const sgp4_propagation = PyNULL()
 
 function __init__()
     copy!(sgp4io, pyimport_conda("sgp4.io", "sgp4", "conda-forge"))
     copy!(earth_gravity, pyimport("sgp4.earth_gravity"))
+    copy!(sgp4_propagation, pyimport("sgp4.propagation"))
 end
 
 export GravityModel,
@@ -36,6 +38,16 @@ GravityModel(ref::AbstractString) = GravityModel(earth_gravity[ref])
 # sgp4.io convenience functions
 function twoline2rv(line1::ASCIIString, line2::ASCIIString, grav::GravityModel)
     return SGP4Sat(sgp4io["twoline2rv"](line1,line2,grav.model))
+end
+
+"""
+Propagate the satellite by `dtmin` minutes.
+
+Returns (position, velocity)
+"""
+function sgp4( sat::SGP4Sat,
+               dtmin::Real )
+    sgp4_propagation["sgp4"](sat.s, dtmin)
 end
 
 """
