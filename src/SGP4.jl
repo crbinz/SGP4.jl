@@ -58,7 +58,7 @@ end
 
 function propagate(sats::Vector{SGP4Sat},
                    dtmin::Real)
-    f = x->propagate(x, dtmin)
+    @compat f = x->propagate(x, dtmin)
     f.(sats)
 end
 
@@ -131,13 +131,13 @@ function propagate( sats::Vector{SGP4Sat},
                     min::Real,
                     sec::Real )
     f = x->propagate(x, year, month, day, hour, min, sec)
-    f.(sats)
+    @compat f.(sats)
 end
 
 function propagate( sats::Vector{SGP4Sat},
                     t::DateTime )
     f = x->propagate(x, Dates.year(t), Dates.month(t), Dates.day(t), Dates.hour(t), Dates.minute(t), Dates.second(t))
-    f.(sats)
+    @compat f.(sats)
 end
 
 end #module
