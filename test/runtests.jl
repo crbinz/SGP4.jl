@@ -43,15 +43,15 @@ function test_multiple_sats()
     t = Dates.DateTime(2000, 6, 29, 12, 50, 19)
     sats = [satellite; satellite; satellite]
 
-    (positions, velocities) = SGP4.propagate( sats, t )
+    rvs = SGP4.propagate( sats, t )
 
-    @test isapprox(positions[1,1], positions[1,3], atol=eps())
-    @test isapprox(positions[2,1], positions[2,3], atol=eps())
-    @test isapprox(positions[3,1], positions[3,3], atol=eps())
+    @test isapprox(rvs[1][1][1], rvs[3][1][1], atol=eps())
+    @test isapprox(rvs[1][1][2], rvs[3][1][2], atol=eps())
+    @test isapprox(rvs[1][1][3], rvs[3][1][3], atol=eps())
 
-    @test isapprox(velocities[1,1], velocities[1,3], atol=eps()) 
-    @test isapprox(velocities[2,1], velocities[2,3], atol=eps())
-    @test isapprox(velocities[3,1], velocities[3,3], atol=eps())
+    @test isapprox(rvs[1][2][1], rvs[3][2][1], atol=eps()) 
+    @test isapprox(rvs[1][2][2], rvs[3][2][2], atol=eps())
+    @test isapprox(rvs[1][2][3], rvs[3][2][3], atol=eps())
 end
 
 function test_datetime_ephem()

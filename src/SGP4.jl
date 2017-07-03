@@ -40,15 +40,26 @@ function twoline2rv(line1::ASCIIString, line2::ASCIIString, grav::GravityModel)
     return SGP4Sat(sgp4io["twoline2rv"](line1,line2,grav.model))
 end
 
+function sgp4( sat::SGP4Sat,
+               dtmin::Real )
+    r,v = sgp4_propagation["sgp4"](sat.s, dtmin)
+    return vcat(r...), vcat(v...)
+end
+
 """
 Propagate the satellite by `dtmin` minutes.
 
 Returns (position, velocity)
 """
-function sgp4( sat::SGP4Sat,
-               dtmin::Real )
-    r,v = sgp4_propagation["sgp4"](sat.s, dtmin)
-    return vcat(r...), vcat(v...)
+function propagate( sat::SGP4Sat,
+                    dtmin::Real )
+    sgp4(sat,dtmin)
+end
+
+function propagate(sats::Vector{SGP4Sat},
+                   dtmin::Real)
+    f = x->propagate(x, dtmin)
+    f.(sats)
 end
 
 """
@@ -119,23 +130,14 @@ function propagate( sats::Vector{SGP4Sat},
                     hour::Real,
                     min::Real,
                     sec::Real )
-    pos = zeros(3,length(sats))
-    vel = zeros(3,length(sats))
-    for i = 1:length(sats)
-        (pos[:,i],vel[:,i]) = propagate(sats[i],year,month,day,hour,min,sec)
-    end
-    return (pos,vel)
+    f = x->propagate(x, year, month, day, hour, min, sec)
+    f.(sats)
 end
 
 function propagate( sats::Vector{SGP4Sat},
                     t::DateTime )
-    propagate(sats,
-              Dates.year(t),
-              Dates.month(t),
-              Dates.day(t),
-              Dates.hour(t),
-              Dates.minute(t),
-              Dates.second(t))
+    f = x->propagate(x, Dates.year(t), Dates.month(t), Dates.day(t), Dates.hour(t), Dates.minute(t), Dates.second(t))
+    f.(sats)
 end
 
 end #module

@@ -31,4 +31,6 @@ You can also generate an ephemeris, given a TLE, start date/time, stop date/time
 (positions, velocities) = propagate(satellite, Dates.DateTime("2000-06-29T12:50:19.000"), Dates.DateTime("2000-06-30T12:50:19.000"), Dates.Second(60))
 ```
 
+For more examples, see `test/runtests.jl`.
+
 For other documentation, see [this page](https://pypi.python.org/pypi/sgp4/).
