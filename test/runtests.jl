@@ -52,6 +52,18 @@ function test_multiple_sats()
     @test isapprox(rvs[1][2][1], rvs[3][2][1], atol=eps()) 
     @test isapprox(rvs[1][2][2], rvs[3][2][2], atol=eps())
     @test isapprox(rvs[1][2][3], rvs[3][2][3], atol=eps())
+
+    dtmin = 10.0
+    
+    rvs2 = SGP4.propagate( sats, dtmin )
+
+    @test isapprox(rvs2[1][1][1], rvs2[3][1][1], atol=eps())
+    @test isapprox(rvs2[1][1][2], rvs2[3][1][2], atol=eps())
+    @test isapprox(rvs2[1][1][3], rvs2[3][1][3], atol=eps())
+
+    @test isapprox(rvs2[1][2][1], rvs2[3][2][1], atol=eps()) 
+    @test isapprox(rvs2[1][2][2], rvs2[3][2][2], atol=eps())
+    @test isapprox(rvs2[1][2][3], rvs2[3][2][3], atol=eps())
 end
 
 function test_datetime_ephem()

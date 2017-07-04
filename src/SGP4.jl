@@ -58,8 +58,8 @@ end
 
 function propagate(sats::Vector{SGP4Sat},
                    dtmin::Real)
-    @compat f = x->propagate(x, dtmin)
-    f.(sats)
+    f = x->propagate(x, dtmin)
+    @compat f.(sats)
 end
 
 """
