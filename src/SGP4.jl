@@ -92,7 +92,7 @@ function propagate( sat::SGP4Sat,
               Dates.day(t),
               Dates.hour(t),
               Dates.minute(t),
-              Dates.second(t))
+              Dates.second(t) + Dates.millisecond(t)/1000)
 end
 
 function propagate(sat::SGP4Sat,
@@ -136,7 +136,7 @@ end
 
 function propagate( sats::Vector{SGP4Sat},
                     t::DateTime )
-    f = x->propagate(x, Dates.year(t), Dates.month(t), Dates.day(t), Dates.hour(t), Dates.minute(t), Dates.second(t))
+    f = x->propagate(x, Dates.year(t), Dates.month(t), Dates.day(t), Dates.hour(t), Dates.minute(t), Dates.second(t) + Dates.millisecond(t)/1000)
     @compat f.(sats)
 end
 
