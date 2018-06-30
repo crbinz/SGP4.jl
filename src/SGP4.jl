@@ -5,9 +5,8 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module SGP4
 
-using PyCall, Compat
+using PyCall, Compat, Dates
 
-import Compat.ASCIIString
 import Base.getindex
 
 const sgp4io = PyNULL()
@@ -24,11 +23,11 @@ export GravityModel,
        twoline2rv,
        propagate
 
-immutable GravityModel
+struct GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
 end
 
-type SGP4Sat
+mutable struct SGP4Sat
     s::PyObject
 end
 getindex(sat::SGP4Sat, sym::Symbol) = sat.s[sym]
@@ -36,7 +35,7 @@ getindex(sat::SGP4Sat, sym::Symbol) = sat.s[sym]
 GravityModel(ref::AbstractString) = GravityModel(earth_gravity[ref])
 
 # sgp4.io convenience functions
-function twoline2rv(line1::ASCIIString, line2::ASCIIString, grav::GravityModel)
+function twoline2rv(line1::String, line2::String, grav::GravityModel)
     return SGP4Sat(sgp4io["twoline2rv"](line1,line2,grav.model))
 end
 
