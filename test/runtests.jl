@@ -1,5 +1,5 @@
 import SGP4
-using Base.Test 
+using Test, Dates
 
 function test_init()
     line1 = "1 00005U 58002B   00179.78495062  .00000023  00000-0  28098-4 0  4753"
