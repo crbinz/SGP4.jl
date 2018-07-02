@@ -1,7 +1,7 @@
 # Julia wrapper for the sgp4 Python library:
 # https://pypi.python.org/pypi/sgp4/
 
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
+__precompile__()
 
 module SGP4
 
@@ -24,11 +24,11 @@ export GravityModel,
        twoline2rv,
        propagate
 
-immutable GravityModel
+struct GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
 end
 
-type SGP4Sat
+mutable struct SGP4Sat
     s::PyObject
 end
 getindex(sat::SGP4Sat, sym::Symbol) = sat.s[sym]
@@ -59,7 +59,7 @@ end
 function propagate(sats::Vector{SGP4Sat},
                    dtmin::Real)
     f = x->propagate(x, dtmin)
-    @compat f.(sats)
+    f.(sats)
 end
 
 """
@@ -131,13 +131,13 @@ function propagate( sats::Vector{SGP4Sat},
                     min::Real,
                     sec::Real )
     f = x->propagate(x, year, month, day, hour, min, sec)
-    @compat f.(sats)
+    f.(sats)
 end
 
 function propagate( sats::Vector{SGP4Sat},
                     t::DateTime )
     f = x->propagate(x, Dates.year(t), Dates.month(t), Dates.day(t), Dates.hour(t), Dates.minute(t), Dates.second(t) + Dates.millisecond(t)/1000)
-    @compat f.(sats)
+    f.(sats)
 end
 
 end #module
