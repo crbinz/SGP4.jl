@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/crbinz/SGP4.jl.svg?branch=master)](https://travis-ci.org/crbinz/SGP4.jl)
 
+*NOTE*: Consider using the pure-julia SGP4 implementation in [SatelliteToolbox.jl](https://github.com/JuliaSpace/SatelliteToolbox.jl#sgp4). 
+
 This package enables satellite orbit propagation using the [SGP4](https://en.wikipedia.org/wiki/Simplified_perturbations_models) models, given the satellites two-line element set ([TLE](http://www.celestrak.com/NORAD/documentation/tle-fmt.asp)). For now, this is a simple wrapper of [python-sgp4](https://github.com/brandon-rhodes/python-sgp4) using [PyCall.jl](https://github.com/stevengj/PyCall.jl). There are several small changes from `python-sgp4`:
 
 1. Gravity coefficients are loaded into a `GravityModel` type. For instance, to load the WGS-72 coefficients, just do `GravityModel("wgs72")`. The other two options are "wgs72old" and "wgs84".
