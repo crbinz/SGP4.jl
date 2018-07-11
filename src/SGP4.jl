@@ -1,13 +1,12 @@
 # Julia wrapper for the sgp4 Python library:
 # https://pypi.python.org/pypi/sgp4/
 
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
+__precompile__()
 
 module SGP4
 
-using PyCall, Compat
+using PyCall, Dates
 
-import Compat.ASCIIString
 import Base.getindex
 
 const sgp4io = PyNULL()
@@ -24,11 +23,11 @@ export GravityModel,
        twoline2rv,
        propagate
 
-immutable GravityModel
+struct GravityModel
     model::PyObject # can be any of {wgs72old, wgs72, wgs84}
 end
 
-type SGP4Sat
+mutable struct SGP4Sat
     s::PyObject
 end
 getindex(sat::SGP4Sat, sym::Symbol) = sat.s[sym]
@@ -36,7 +35,7 @@ getindex(sat::SGP4Sat, sym::Symbol) = sat.s[sym]
 GravityModel(ref::AbstractString) = GravityModel(earth_gravity[ref])
 
 # sgp4.io convenience functions
-function twoline2rv(line1::ASCIIString, line2::ASCIIString, grav::GravityModel)
+function twoline2rv(line1::String, line2::String, grav::GravityModel)
     return SGP4Sat(sgp4io["twoline2rv"](line1,line2,grav.model))
 end
 
@@ -59,7 +58,7 @@ end
 function propagate(sats::Vector{SGP4Sat},
                    dtmin::Real)
     f = x->propagate(x, dtmin)
-    @compat f.(sats)
+    f.(sats)
 end
 
 """
@@ -131,13 +130,13 @@ function propagate( sats::Vector{SGP4Sat},
                     min::Real,
                     sec::Real )
     f = x->propagate(x, year, month, day, hour, min, sec)
-    @compat f.(sats)
+    f.(sats)
 end
 
 function propagate( sats::Vector{SGP4Sat},
                     t::DateTime )
     f = x->propagate(x, Dates.year(t), Dates.month(t), Dates.day(t), Dates.hour(t), Dates.minute(t), Dates.second(t) + Dates.millisecond(t)/1000)
-    @compat f.(sats)
+    f.(sats)
 end
 
 end #module
