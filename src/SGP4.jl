@@ -1,8 +1,6 @@
 # Julia wrapper for the sgp4 Python library:
 # https://pypi.python.org/pypi/sgp4/
 
-__precompile__()
-
 module SGP4
 
 using PyCall, Dates
